@@ -631,7 +631,7 @@ class SQLiteAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $table = new \Phinx\Db\Table('table1', array(), $this->adapter);
         $table->addColumn('column1', 'string')
-              ->addColumn('column2', 'integer')
+              ->addColumn('column2', 'integer', array('null' => true))
               ->insert(array(
                   array(
                       'column1' => 'value1',
