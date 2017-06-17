@@ -326,7 +326,7 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
             'ALTER TABLE %s ADD COLUMN %s %s',
             $this->quoteTableName($table->getName()),
             $this->quoteColumnName($column->getName()),
-            $this->getColumnSqlDefinition($column)
+            $this->getColumnSqlDefinition($column, true)
         );
 
         $this->writeCommand('addColumn', array($table->getName(), $column->getName(), $column->getType()));
@@ -1041,9 +1041,10 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
      * Gets the SQLite Column Definition for a Column object.
      *
      * @param Column $column Column
+     * @param boolean $calledByAddColumn called by addColumn method
      * @return string
      */
-    protected function getColumnSqlDefinition(Column $column)
+    protected function getColumnSqlDefinition(Column $column, $calledByAddColumn = false)
     {
         $sqlType = $this->getSqlType($column->getType());
         $def = '';
@@ -1061,7 +1062,11 @@ class SQLiteAdapter extends PdoAdapter implements AdapterInterface
 
         $default = $column->getDefault();
 
-        $def .= ($column->isNull() || is_null($default)) ? ' NULL' : ' NOT NULL';
+        if ($calledByAddColumn) {
+          $def .= ($column->isNull() || is_null($default)) ? ' NULL' : ' NOT NULL';
+        } else {
+          $def .= $column->isNull() ? ' NULL' : ' NOT NULL';
+        }
         $def .= $this->getDefaultValueDefinition($default);
         $def .= ($column->isIdentity()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
 
